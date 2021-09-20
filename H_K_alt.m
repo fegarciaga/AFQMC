@@ -141,52 +141,52 @@ function H=H_K_alt(Lx,Ly,Lz,kx,ky,kz,tx1,ty1,tz1,tx2,ty2,tz2)
                               H(r,r+Lx-1+(Ly-1)*Lx)=H(r,r+Lx-1+(Ly-1)*Lx)-tz2*exp(kx)*exp(ky);
                               H(r,r+2*Lx-1)=H(r,r+2*Lx-1)-tz2*exp(kx);
                               H(r,r+1+(Ly-1)*Lx)=H(r,r+1+(Ly-1)*Lx)-tz2*exp(ky);
-                              H(r,r+1+Lx)=-tz2;
+                              H(r,r+1+Lx)=H(r,r+1+Lx)-tz2;
                            
                            elseif iy==Ly
                                H(r,r+(Lx-1)-(Ly-1)*Lx)=H(r,r+(Lx-1)-(Ly-1)*Lx)-tz2*exp(kx)*exp(-ky);
                                H(r,r+1-(Ly-1)*Lx)=H(r,r+1-(Ly-1)*Lx)-tz2*exp(-ky);
                                H(r,r-1)=H(r,r-1)-tz2*exp(kx);
-                               H(r,r+1-Lx)=-tz2;
+                               H(r,r+1-Lx)=H(r,r+1-Lx)-tz2;
                                
                            else
                                H(r,r+2*Lx-1)=H(r,r+2*Lx-1)-tz2*exp(kx);
                                H(r,r-1)=H(r,r-1)-tz2*exp(kx);
-                               H(r,r+1+Lx)= -tz2;
-                               H(r,r+1-Lx)= -tz2;
+                               H(r,r+1+Lx)= H(r,r+1+Lx)-tz2;
+                               H(r,r+1-Lx)= H(r,r+1-Lx)-tz2;
                            end
                         elseif jx==Lx
                             if iy==1
                                 H(r,r-(Lx-1)+(Ly-1)*Lx)=H(r,r-(Lx-1)+(Ly-1)*Lx)-tz2*exp(-kx)*exp(ky);
                                 H(r,r+1)=H(r,r+1)-tz2*exp(-kx);
                                 H(r,r+(Ly-1)*Lx-1)=H(r,r+(Ly-1)*Lx-1)-tz2*exp(ky);
-                                H(r,r-1+Lx)=-tz2;
+                                H(r,r-1+Lx)=H(r,r-1+Lx)-tz2;
                                 
                             elseif iy==Ly
                                 H(r,r-(Lx-1)-(Ly-1)*Lx)=H(r,r-(Lx-1)-(Ly-1)*Lx)-tz2*exp(-kx)*exp(-ky);
                                 H(r,r-(2*Lx-1))= H(r,r-(2*Lx-1))-tz2*exp(-kx);
                                 H(r,r-1-(Ly-1)*Lx)= H(r,r-1-(Ly-1)*Lx)-tz2*exp(-ky);
-                                H(r,r-1-Lx)=-tz2;
+                                H(r,r-1-Lx)=H(r,r-1-Lx)-tz2;
                             else
                                 H(r,r+1)=H(r,r+1)-tz2*exp(-kx);
                                 H(r,r-(2*Lx-1))=H(r,r-(2*Lx-1))-tz2*exp(-kx);
-                                H(r,r-1-Lx)=-tz2;
-                                H(r,r-1+Lx)=-tz2;
+                                H(r,r-1-Lx)=H(r,r-1-Lx)-tz2;
+                                H(r,r-1+Lx)=H(r,r-1+Lx)-tz2;
                             end
                         
                         elseif iy==1
                             if mod(jx,Lx)>1
                                 H(r,r-1+(Ly-1)*Lx)=H(r,r-1+(Ly-1)*Lx)-tz2*exp(ky);
                                 H(r,r+1+(Ly-1)*Lx)=H(r,r+1+(Ly-1)*Lx)-tz2*exp(ky);
-                                H(r,r-1+Lx)=-tz2;
-                                H(r,r+1+Lx)=-tz2;
+                                H(r,r-1+Lx)=H(r,r-1+Lx)-tz2;
+                                H(r,r+1+Lx)=H(r,r+1+Lx)-tz2;
                             end
                         elseif iy==Ly
                             if mod(jx,Lx)>1
                                 H(r,r-1-(Ly-1)*Lx)= H(r,r-1-(Ly-1)*Lx)-tz2*exp(-ky);
                                 H(r,r+1-(Ly-1)*Lx)= H(r,r+1-(Ly-1)*Lx)-tz2*exp(-ky);
-                                H(r,r-1-Lx)=-tz2;
-                                H(r,r+1-Lx)=-tz2;
+                                H(r,r-1-Lx)=H(r,r-1-Lx)-tz2;
+                                H(r,r+1-Lx)=H(r,r+1-Lx)-tz2;
                             end
                         else
                             H(r,r+1+Lx)=-tz2;

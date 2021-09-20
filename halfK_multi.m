@@ -31,10 +31,15 @@ function [phi, w, O, O_prov, invO_matrix_up, invO_matrix_dn] = halfK_multi(phi, 
     invO_matrix_dn=zeros(N_par-N_up,N_par-N_up,N_det);
     O_new=0;
     for ii=1:N_det
-        invO_matrix_up(:,:,ii)=inv(Phi_T(:,1:N_up,ii)'*phi(:,1:N_up));
-        invO_matrix_dn(:,:,ii)=inv(Phi_T(:,N_up+1:N_par,ii)'*phi(:,N_up+1:N_par));
-        % calculate the new overlap
-        O_prov(ii)=1/(det(invO_matrix_up(:,:,ii))*det(invO_matrix_dn(:,:,ii)));
+        O_prov(ii)=0;
+        if abs(det(Phi_T(:,1:N_up,ii)'*phi(:,1:N_up)))>=1e-4
+            if abs(det(Phi_T(:,N_up+1:N_par,ii)'*phi(:,N_up+1:N_par)))>=1e-4
+                invO_matrix_up(:,:,ii)=inv(Phi_T(:,1:N_up,ii)'*phi(:,1:N_up));
+                invO_matrix_dn(:,:,ii)=inv(Phi_T(:,N_up+1:N_par,ii)'*phi(:,N_up+1:N_par));
+                % calculate the new overlap
+                O_prov(ii)=1/(det(invO_matrix_up(:,:,ii))*det(invO_matrix_dn(:,:,ii)));
+            end
+        end
         O_new=O_new+w_T(ii)*O_prov(ii);
     end
     O_ratio=O_new/O;
@@ -48,5 +53,4 @@ function [phi, w, O, O_prov, invO_matrix_up, invO_matrix_dn] = halfK_multi(phi, 
     else
         w=0;
     end
-
 end

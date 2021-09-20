@@ -53,7 +53,7 @@ for ii=1:N_det
     OV=OV+O_prov_ratio_temp(1,:,ii)*O_prov(ii)*w_T(ii)/O;
 end
 
-O_ratio_temp_real=max(OV, zeros(1,2));
+O_ratio_temp_real=max(real(OV), zeros(1,2));
 % the normalization for the importance-sampled pdf
 sum_O_ratio_temp_real=O_ratio_temp_real(1)+O_ratio_temp_real(2);
 

@@ -1,4 +1,4 @@
-function [e, ss_corr, cc_corr] = measure(H_k, phi, Phi_T, invO_matrix_up, invO_matrix_dn, N_up, N_par, U, i, j)
+function [e] = measure(H_k, phi, Phi_T, invO_matrix_up, invO_matrix_dn, N_up, N_par, U)
 % function e = measure(H_k, phi, Phi_T, invO_matrix_up, invO_matrix_dn, N_up, N_par, U)
 % Calculate the mixed estimator for the ground state energy of a walker
 % Inputs:
@@ -35,11 +35,6 @@ function [e, ss_corr, cc_corr] = measure(H_k, phi, Phi_T, invO_matrix_up, invO_m
     potentialEnergy=n_int*U;
     %% calculate the kinetic energy:
     kineticEnergy=sum(sum(H_k.'.*(G_up+G_dn))); % note the element-wise multiplication
-    %% calculate ss correlation
-    ss_corr=G_up(i,i)*G_up(j,j)'+G_dn(i,i)*G_dn(j,j)'-G_up(j,j)*G_dn(i,i)'-G_up(i,i)*G_dn(j,j)';
-    %% calculate cc corretarion
-    cc_corr=G_up(i,i)*G_up(j,j)'+G_dn(i,i)*G_dn(j,j)'+G_up(j,j)*G_dn(i,i)'+G_up(i,i)*G_dn(j,j)';
-
     %% calculate the total energy:
     e=potentialEnergy+kineticEnergy;
 

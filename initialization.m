@@ -34,7 +34,7 @@ n_r_dn=diag(Phi_T(:,N_up+1:N_par)*(Phi_T(:,N_up+1:N_par))');
 E_V=U*n_r_up'*n_r_dn;
 % the total energy of the trial wave function = the initial trial energy
 E_T = E_K+E_V;
-
+display(E_T);
 %% Assemble the initial population of walkers
 Phi=zeros(N_sites,N_par,N_wlk);
 % initiate each walker to be the trial wave function

@@ -1,4 +1,4 @@
-function [Phi, w, O]=pop_cntrl(Phi, w, O, N_wlk, N_sites, N_par)
+function [Phi, w, O, O_prov]=pop_cntrl_multi(Phi, w, O, O_prov, N_wlk, N_sites, N_par, N_det)
 % function [Phi, w, O]=pop_cntrl(Phi, w, O, N_wlk, N_sites, N_par)
 % Perform population control with a simple "combing" method
 % Inputs:
@@ -14,7 +14,7 @@ function [Phi, w, O]=pop_cntrl(Phi, w, O, N_wlk, N_sites, N_par)
 %   O: the new array of overlaps
 %
 % Huy Nguyen, Hao Shi, Jie Xu and Shiwei Zhang
-% ©2014 v1.0
+% Â©2014 v1.0
 % Package homepage: http://cpmc-lab.wm.edu
 % Distributed under the <a href="matlab: web('http://cpc.cs.qub.ac.uk/licence/licence.html')">Computer Physics Communications Non-Profit Use License</a>
 % Any publications resulting from either applying or building on the present package 
@@ -25,8 +25,8 @@ function [Phi, w, O]=pop_cntrl(Phi, w, O, N_wlk, N_sites, N_par)
     % Create empty matrices that will hold the outputs
     new_Phi=zeros(N_sites, N_par, N_wlk); %in the end the number of walkers will still be N_wlk
     new_O=zeros(N_wlk,1);
-    % scaling factor to bring the current total weight back to the original
-    % level (=N_wlk)
+    new_O_prov=zeros(N_wlk,N_det);
+    % scaling factor to bring the current total weight back to the original level (=N_wlk)
     d=N_wlk/sum(w);
     % start the "comb" at a random position to avoid bias against the first walker
     sum_w=-rand;
@@ -39,6 +39,7 @@ function [Phi, w, O]=pop_cntrl(Phi, w, O, N_wlk, N_sites, N_par)
         for j=(n_wlk+1):n
             new_Phi(:,:,j)=Phi(:,:,i_wlk);
             new_O(j)=O(i_wlk);
+            new_O_prov(j,:)=O_prov(i_wlk,:);
         end
         n_wlk=n;
     end
@@ -46,6 +47,7 @@ function [Phi, w, O]=pop_cntrl(Phi, w, O, N_wlk, N_sites, N_par)
     %% Return the new population, weights and overlaps:
     Phi=new_Phi;
     O=new_O;
+    O_prov=new_O_prov;
     % All new walkers have weights to 1 and the total weight = N_wlk
     w=ones(N_wlk,1);
     

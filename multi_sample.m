@@ -16,18 +16,18 @@ Lz=1; % The number of lattice sites in the z direction
 N_up=8; % The number of spin-up electrons
 N_dn=8; % The number of spin-down electrons
 
-N_det=5; % The number of determinants in multi-determinant trial wavefunction
+N_det=3; % The number of determinants in multi-determinant trial wavefunction
 
 kx=+0.0; % The x component of the twist angle in TABC (twist-averaging boundary condition)
 ky=+0.0; % The y component of the twist angle in TABC
 kz=0; % The z component of the twist angle in TABC
 
-U=10; % The on-site repulsion strength in the Hubbard Hamiltonian
+U=12; % The on-site repulsion strength in the Hubbard Hamiltonian
 tx=1; % The hopping amplitude between nearest-neighbor sites in the x direction
 ty=1; % The hopping amplitude between nearest neighbor sites in the y direction
 tz=1; % The hopping amplitude between nearest neighbor sites in the z direction
 
-tz2=5;
+tz2=0.8;
 tx2=0.0;
 ty2=0.0;
 
@@ -38,9 +38,9 @@ deltau=0.01; % The imaginary time step
 N_wlk=500; % The number of random walkers
 N_blksteps=40; % The number of random walk steps in each block
 N_eqblk=30; % The number of blocks used to equilibrate the random walk before energy measurement takes place
-N_blk=150; % The number of blocks used in the measurement phase
+N_blk=50; % The number of blocks used in the measurement phase
 itv_modsvd=1; % The interval between two adjacent modified Gram-Schmidt re-orthonormalization of the random walkers. No re-orthonormalization if itv_modsvd > N_blksteps
-itv_pc=5; % The interval between two adjacent population controls. No population control if itv_pc > N_blksteps
+itv_pc=10; % The interval between two adjacent population controls. No population control if itv_pc > N_blksteps
 itv_Em=40; % The interval between two adjacent energy measurements
 suffix=datestr(now,'_yymmdd_HHMMSS'); % time stamp for the saved *.mat filename. Can be changed to any desired string 
 %% Create array for potential energy
@@ -51,9 +51,9 @@ E_err_spl=zeros(N_run,1);
 
 for ii=1:N_run
     suffix=strcat('_try',int2str(tz2(ii)));
-%     [E_ave_fe(ii),E_err_fe(ii), ss_ave, ss_err, cc_ave, cc_err, savedFile]=CPMC_Lab(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,tx2,ty2,tz2(ii),deltau,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em, i, j, suffix);
-%     [E_ave_cl(ii),E_err_cl(ii), ss_ave, ss_err, cc_ave, cc_err, savedFile1]=CPMC_Lab1(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,tx2,ty2,tz2(ii),deltau,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em, i, j, suffix);
     [E_ave_spl(ii),E_err_spl(ii), savedFile]=CPMC_Lab_multi(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,tx2,ty2,tz2(ii),deltau,N_det,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em, suffix);
+    [E_ave_fe(ii),E_err_fe(ii), ss_ave, ss_err, cc_ave, cc_err, savedFile]=CPMC_Lab(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,tx2,ty2,tz2(ii),deltau,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em, i, j, suffix);
+%     [E_ave_cl(ii),E_err_cl(ii), ss_ave, ss_err, cc_ave, cc_err, savedFile1]=CPMC_Lab1(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,tx2,ty2,tz2(ii),deltau,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em, i, j, suffix);
 %     [E_ave_afm(ii),E_err_afm(ii), ss_ave, ss_err, cc_ave, cc_err, savedFile]=CPMC_Lab3(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,tx2,ty2,tz2(ii),deltau,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em, i, j, suffix);
 end
 %% plot
@@ -61,7 +61,7 @@ figure; hold on
 a1=errorbar(tz2, E_ave_fe, E_err_fe);
 M1="Free electron";
 a4=errorbar(tz2, E_ave_spl, E_err_spl);
-M4="Spin liquid";
+M4="colinear";
 xlabel ('t');
 ylabel ('E');
 legend([a1, a4],[M1, M4]);

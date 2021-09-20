@@ -20,12 +20,12 @@ kx=+0.0; % The x component of the twist angle in TABC (twist-averaging boundary 
 ky=+0.0; % The y component of the twist angle in TABC
 kz=0; % The z component of the twist angle in TABC
 
-U=4; % The on-site repulsion strength in the Hubbard Hamiltonian
+U=12; % The on-site repulsion strength in the Hubbard Hamiltonian
 tx=1; % The hopping amplitude between nearest-neighbor sites in the x direction
 ty=1; % The hopping amplitude between nearest neighbor sites in the y direction
 tz=1; % The hopping amplitude between nearest neighbor sites in the z direction
 
-tz2=[0.1 0.2 0.3 0.4 0.5];
+tz2=0.7;
 tx2=0.0;
 ty2=0.0;
 
@@ -55,24 +55,24 @@ E_err_spl=zeros(N_run,1);
 
 for ii=1:N_run
     suffix=strcat('_try',int2str(tz2(ii)));
-    [E_ave_fe(ii),E_err_fe(ii), ss_ave, ss_err, cc_ave, cc_err, savedFile]=CPMC_Lab(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,tx2,ty2,tz2(ii),deltau,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em, i, j, suffix);
+    [E_ave_fe(ii),E_err_fe(ii), savedFile]=CPMC_Lab_alt(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,tx2,ty2,tz2(ii),deltau,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em, suffix);
 %     [E_ave_cl(ii),E_err_cl(ii), ss_ave, ss_err, cc_ave, cc_err, savedFile1]=CPMC_Lab1(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,tx2,ty2,tz2(ii),deltau,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em, i, j, suffix);
-%     [E_ave_spl(ii),E_err_spl(ii), ss_ave, ss_err, cc_ave, cc_err, savedFile]=CPMC_Lab2(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,tx2,ty2,tz2(ii),deltau,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em, i, j, suffix);
-    [E_ave_afm(ii),E_err_afm(ii), ss_ave, ss_err, cc_ave, cc_err, savedFile]=CPMC_Lab3(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,tx2,ty2,tz2(ii),deltau,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em, i, j, suffix);
+    [E_ave_spl(ii),E_err_spl(ii), savedFile]=CPMC_Lab2(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,tx2,ty2,tz2(ii),deltau,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em, i, j, suffix);
+%     [E_ave_afm(ii),E_err_afm(ii), ss_ave, ss_err, cc_ave, cc_err, savedFile]=CPMC_Lab3(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,tx2,ty2,tz2(ii),deltau,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em, i, j, suffix);
 end
 %% plot
 figure; hold on
 a1=errorbar(tz2, E_ave_fe, E_err_fe);
 M1="Free electron";
-% a2=errorbar(tz2, E_ave_cl, E_err_cl);
-% M2="Colinear";
+a2=errorbar(tz2, E_ave_cl, E_err_cl);
+M2="Colinear";
 a3=errorbar(tz2, E_ave_afm, E_err_afm);
 M3="Antiferromagnetic";
-% a4=errorbar(tz2, E_ave_spl, E_err_spl);
-% M4="Spin liquid";
+a4=errorbar(tz2, E_ave_spl, E_err_spl);
+M4="Spin liquid";
 xlabel ('t');
 ylabel ('E');
-legend([a1, a3],[M1, M3]);
+legend([a1, a2],[M1, M2]);
 hold off;
 %% Calculate potential energy
 %E_pot=0

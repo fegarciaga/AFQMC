@@ -29,7 +29,6 @@ for ii=1:N_det
         Phi_T=RVB(Phi_T, N_sites, N_up, ii, jj);
     end
 end
-
 % initialize weights of multideterminant trial wavefunction
 w_T=1/sqrt(N_det)*ones(N_det, 1);
 % initialize matrix for initial green function
@@ -53,10 +52,12 @@ for ii=1:N_det
     n_r_up=diag(Phi_T(:,1:N_up,ii)*(Phi_T(:,1:N_up,ii))');
     n_r_dn=diag(Phi_T(:,N_up+1:N_par,ii)*(Phi_T(:,N_up+1:N_par,ii))');
     E_V=E_V+w_T(ii)^2*U*n_r_up'*n_r_dn;
+    display(G_dn);
+    display(G_up);
 end
 % the total energy of the trial wave function = the initial trial energy
 E_T = E_K+E_V;
-
+display(Phi_T);
 %% Assemble the initial population of walkers
 Phi=zeros(N_sites,N_par,N_wlk);
 % initiate each walker to be the trial wave function
@@ -68,9 +69,12 @@ for i=1:N_wlk
     Phi(:,:,i)=Phi_T(:,:,mod(i,N_det)+1); 
 end
 % initiate the weight and overlap of each walker to 1
-w=ones(N_wlk,1);
-O=ones(N_wlk,1);
-O_prov=ones(N_wlk, N_det);
+w=1/sqrt(N_det)*ones(N_wlk,1);
+O=1/sqrt(N_det)*ones(N_wlk,1);
+O_prov=zeros(N_wlk, N_det);
+for ii=1:N_wlk
+    O_prov(ii,mod(ii,N_det)+1)=1;
+end
 % the arrays that store the energy and weight at each block
 E_blk=zeros(N_blk,1);
 W_blk=zeros(N_blk,1);

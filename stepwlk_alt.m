@@ -1,4 +1,4 @@
-function [phi, w, O, E, W, SS, CC] = stepwlk(phi, N_wlk, N_sites, w, O, E, W, SS, CC, H_k, Proj_k_half, flag_mea, Phi_T, N_up, N_par, U, fac_norm, aux_fld)
+function [phi, w, O, E, W] = stepwlk_alt(phi, N_wlk, N_sites, w, O, E, W, H_k, Proj_k_half, flag_mea, Phi_T, N_up, N_par, U, fac_norm, deltau)
 % function [phi, w, O, E, W] = stepwlk(phi, N_wlk, N_sites, w, O, E, W, H_k, Proj_k_half, flag_mea, Phi_T, N_up, N_par, U, fac_norm, aux_fld)
 % Perform one step of the random walk
 % Inputs:
@@ -26,7 +26,7 @@ function [phi, w, O, E, W, SS, CC] = stepwlk(phi, N_wlk, N_sites, w, O, E, W, SS
 %   W: the new total weight of all walkers
 %   
 % Huy Nguyen, Hao Shi, Jie Xu and Shiwei Zhang
-% ©2014 v1.0
+% Â©2014 v1.0
 % Package homepage: http://cpmc-lab.wm.edu
 % Distributed under the <a href="matlab: web('http://cpc.cs.qub.ac.uk/licence/licence.html')">Computer Physics Communications Non-Profit Use License</a>
 % Any publications resulting from either applying or building on the present package 
@@ -35,14 +35,11 @@ function [phi, w, O, E, W, SS, CC] = stepwlk(phi, N_wlk, N_sites, w, O, E, W, SS
 
 %% Propagate each walker:
 e=zeros(N_wlk,1); % Array containing the energy of each walker
-ss_corr=zeros(N_wlk,1);
-cc_corr=zeros(N_wlk,1);
 
 for i_wlk=1:N_wlk
     Phi=phi(:,:,i_wlk);
     if w(i_wlk)>0
-         % multiply by the pre-factor exp(-deltau*(E_T)) in the ground-state projector 
-         % and by the prefactor exp(-0.5*U*(N_up+N_dn)) in the Hirsch transformation
+        % multiply by the pre-factor exp(-deltau*(E_T)) in the ground-state projector 
         w(i_wlk)=w(i_wlk)*exp(fac_norm);
         % propagate by the kinetic term exp(-1/2*deltau*K)
         [Phi, w(i_wlk), O(i_wlk), invO_matrix_up, invO_matrix_dn]=halfK(Phi, w(i_wlk), O(i_wlk), Proj_k_half, Phi_T, N_up, N_par);
@@ -50,7 +47,8 @@ for i_wlk=1:N_wlk
             % propagate each lattice site of a walker by the potential term:
             for j_site=1:N_sites
                 if w(i_wlk)>0
-                    [Phi(j_site,:), O(i_wlk), w(i_wlk), invO_matrix_up, invO_matrix_dn]=V(Phi(j_site,:), Phi_T(j_site,:), N_up, N_par, O(i_wlk), w(i_wlk), invO_matrix_up, invO_matrix_dn, aux_fld);
+                    [Phi(j_site,:), O(i_wlk), w(i_wlk), invO_matrix_up, invO_matrix_dn]=V_alt_1(Phi(j_site,:), Phi_T(j_site,:), N_up, N_par, O(i_wlk), w(i_wlk), invO_matrix_up, invO_matrix_dn, deltau, U);
+                    [Phi(j_site,:), O(i_wlk), w(i_wlk), invO_matrix_up, invO_matrix_dn]=V_alt_2(Phi(j_site,:), Phi_T(j_site,:), N_up, N_par, O(i_wlk), w(i_wlk), invO_matrix_up, invO_matrix_dn, deltau, U);
                 end
             end
         end
@@ -60,7 +58,7 @@ for i_wlk=1:N_wlk
             if w(i_wlk)>0
                 % measure the energy if needed:
                 if flag_mea==1
-                    [e(i_wlk), ss_corr(i_wlk), cc_corr(i_wlk)]=measure(H_k, Phi(:,:), Phi_T,  invO_matrix_up, invO_matrix_dn, N_up, N_par, U, i, j);
+                    [e(i_wlk)]=measure(H_k, Phi(:,:), Phi_T,  invO_matrix_up, invO_matrix_dn, N_up, N_par, U);
                 end
             end
         end

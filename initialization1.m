@@ -22,36 +22,34 @@ Proj_k_half = expm(-0.5*deltau*H_k);
 %% Initialize the trial wave function and calculate the ensemble's initial energy 
 % Creates colinear trial wave-function for half-filling scenario
 Phi_T=zeros(N_sites, N_par);
-m=0;
+% Diagonalize kinetic hamiltonian for restricted domain (rows or columns)
+H_res=H_col(Lx, kx, tx);
+[psi_nonint,E_nonint_m] = eig(H_res);
+E_nonint_v=diag(E_nonint_m);
 par=1;
-for jy=1:Ly
-    for ix=1:Lx
-        for kz=1:Lz
-            m=m+1;
-            if bitand(jy,1)==1
-                Phi_T(m, par)=1;
-                Phi_T(m+Ly, N_up+par)=1;
-                par=par+1;
-            end
-        end
-    end
+for i=1:round(N_up/Lx)
+    Phi_T(8*(i-1)+1:4*(2*i-1),par:3+par)=psi_nonint;
+    Phi_T(8*(i-1)+5:8*i,N_up+par:N_up+3+par)=psi_nonint;
+    par=par+4;
 end
-display(Phi_T);
-invO_matrix_up=inv(Phi_T(:,1:N_up)'*Phi_T(:,1:N_up));
-invO_matrix_dn=inv(Phi_T(:,N_up+1:N_par)'*Phi_T(:,N_up+1:N_par));
-temp_up=Phi_T(:,1:N_up)*invO_matrix_up;
-temp_dn=Phi_T(:,N_up+1:N_par)*invO_matrix_dn;
-G_up=temp_up*Phi_T(:,1:N_up)';
-G_dn=temp_dn*Phi_T(:,N_up+1:N_par)';
-E_K=sum(sum(H_k.'.*(G_up+G_dn)));
-% display(E_K);
-% the potential energy of the trial wave function
-n_r_up=diag(Phi_T(:,1:N_up)*(Phi_T(:,1:N_up))');
-n_r_dn=diag(Phi_T(:,N_up+1:N_par)*(Phi_T(:,N_up+1:N_par))');
-E_V=U*n_r_up'*n_r_dn;
+% m=0;
+% par=1;
+% for jy=1:Ly
+%     for ix=1:Lx
+%         for kz=1:Lz
+%             m=m+1;
+%             if bitand(jy,1)==1
+%                 Phi_T(m, par)=1;
+%                 Phi_T(m+Ly, N_up+par)=1;
+%                 par=par+1;
+%             end
+%         end
+%     end
+% end
+% estimates total energy, the 
 % the total energy of the trial wave function = the initial trial energy
-E_T = E_K+E_V;
-
+E_T = sum(E_nonint_v);
+display(E_T);
 %% Assemble the initial population of walkers
 Phi=zeros(N_sites,N_par,N_wlk);
 % initiate each walker to be the trial wave function

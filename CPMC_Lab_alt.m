@@ -1,4 +1,5 @@
-function [E_ave,E_err,savedFileName]=CPMC_Lab_multi(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,tx2,ty2,tz2,deltau,N_det,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em, suffix)
+function [E_ave,E_err, ss_ave, ss_err, cc_ave, cc_err, savedFileName]=CPMC_Lab_alt(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,tx2,ty2,tz2,deltau,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em,suffix)
+% function [E_ave,E_err,savedFileName]=CPMC_Lab(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,U,tx,ty,tz,deltau,N_wlk,N_blksteps,N_eqblk,N_blk,itv_modsvd,itv_pc,itv_Em, suffix)
 % Perform a constrained path Monte Carlo calculatiion. Main function in the CPMC-Lab package
 % Input
 %   Lx: The number of lattice sites in the x direction.
@@ -13,11 +14,6 @@ function [E_ave,E_err,savedFileName]=CPMC_Lab_multi(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,
 %   tx: The hopping amplitude between nearest-neighbor sites in the x direction
 %   ty: The hopping amplitude between nearest neighbor sites in the y direction
 %   tz: The hopping amplitude between nearest neighbor sites in the z direction
-%   tx2: The hopping amplitude between next-nearest neighbor sites in plane
-%   orthonogonal to x
-%   ty2: Idem for y
-%   tz2: Idem for z
-%   N_det: Number of determinats in multi-determinant trial wavefunction
 %   deltau: The imaginary time step
 %   N_wlk: The number of random walkers
 %   N_blksteps: The number of random walk steps in each block
@@ -42,7 +38,7 @@ function [E_ave,E_err,savedFileName]=CPMC_Lab_multi(Lx,Ly,Lz,N_up,N_dn,kx,ky,kz,
 
 %% Initialization
 tic; % start the  timer
-multi_initialization; % initialize internal constants, form the trial wave function and assemble the initial population of walkers
+initialization_alt; % initialize internal constants, form the trial wave function and assemble the initial population of walkers
 format long;
 flag_mea=0; %determine when a measurement should take place
 E=0;
@@ -54,15 +50,16 @@ W_blk=zeros(N_blk,1); % array to store the total weight in every block
 %% Equilibration phase
 for i_blk=1:N_eqblk
     for j_step=1:N_blksteps
-        [Phi, w, O, O_prov, E, W] = stepwlk_multi(Phi, N_wlk, w, O, O_prov, E, W, H_k, Proj_k_half, flag_mea, Phi_T, w_T, N_up, N_par, N_sites, N_det, U, fac_norm, aux_fld);
+        [Phi, w, O, E, W] = stepwlk_alt(Phi, N_wlk, N_sites, w, O, E, W, H_k, Proj_k_half, flag_mea, Phi_T, N_up, N_par, U, fac_norm, deltau);
         if mod(j_step,itv_modsvd)==0
-            [Phi, O, O_prov] = stblz_multi(Phi, N_wlk, O, O_prov, N_up, N_par); % re-orthonormalize the walkers
+            [Phi, O] = stblz(Phi, N_wlk, O, N_up, N_par); % re-orthonormalize the walkers
         end
         if mod(j_step,itv_pc)==0
-            [Phi, w, O, O_prov]=pop_cntrl_multi(Phi, w, O, O_prov, N_wlk, N_sites, N_par, N_det); % population control
+            [Phi, w, O]=pop_cntrl(Phi, w, O, N_wlk, N_sites, N_par); % population control
         end
     end
 end
+
 %% Measurement phase    
 for i_blk=1:N_blk
     for j_step=1:N_blksteps
@@ -72,16 +69,16 @@ for i_blk=1:N_blk
             flag_mea=0;
         end
         % propagate the walkers:
-        [Phi, w, O, O_prov, E_blk(i_blk), W_blk(i_blk)] = stepwlk_multi(Phi, N_wlk, w, O, O_prov, E_blk(i_blk), W_blk(i_blk), H_k, Proj_k_half, flag_mea, Phi_T, w_T, N_up, N_par, N_sites, N_det, U, fac_norm, aux_fld);
+        [Phi, w, O, E_blk(i_blk), W_blk(i_blk)] = stepwlk_alt(Phi, N_wlk, N_sites, w, O, E_blk(i_blk), W_blk(i_blk), H_k, Proj_k_half, flag_mea, Phi_T, N_up, N_par, U, fac_norm, aux_fld, i, j);
         if mod(j_step,itv_modsvd)==0
-            [Phi, O, O_prov] = stblz_multi(Phi, N_wlk, O, O_prov, N_up, N_par); % re-orthonormalize the walkers
+            [Phi, O] = stblz(Phi, N_wlk, O, N_up, N_par); % re-orthonormalize the walkers
         end
         if mod(j_step,itv_pc)==0
-            [Phi, w, O]=pop_cntrl_multi(Phi, w, O, O_prov, N_wlk, N_sites, N_par, N_det); % population control
+            [Phi, w, O]=pop_cntrl(Phi, w, O, N_wlk, N_sites, N_par); % population control
         end
         if mod(j_step, itv_Em)==0
             % update the exponent of the pre-factor exp(-deltau*(H-E_T))
-            fac_norm=(real(E_blk(i_blk)/W_blk(i_blk))-0.5*U*N_par)*deltau;
+            fac_norm=(real(E_blk(i_blk)/W_blk(i_blk)))*deltau;
         end
     end
     E_blk(i_blk)=E_blk(i_blk)/W_blk(i_blk);
@@ -92,6 +89,10 @@ end
 E=real(E_blk);
 E_ave=mean(E)
 E_err=std(E)/sqrt(N_blk)
+ss_ave=mean(real(ss_blk))
+ss_err=std(real(ss_blk))/sqrt(N_blk)
+cc_ave=mean(real(cc_blk))
+cc_err=std(real(cc_blk))/sqrt(N_blk)
 % The total computational time:
 time=toc() % stops the timer
 

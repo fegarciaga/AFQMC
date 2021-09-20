@@ -8,7 +8,7 @@ function [Phi_T]=RVB(Phi_T, N_sites, N_up, i, j)
                 if sum(Phi_T(i2, :, i))==0
                     Phi_T(i1, j, i)=1/sqrt(2);    
                     Phi_T(i2, j, i)=1/sqrt(2);  
-                    Phi_T(i1, j+N_up, i)=-1/sqrt(2);    
+                    Phi_T(i1, j+N_up, i)=1/sqrt(2);    
                     Phi_T(i2, j+N_up, i)=1/sqrt(2); 
                     flag=1;
                 end
